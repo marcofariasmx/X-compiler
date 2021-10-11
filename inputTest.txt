@@ -1,0 +1,17 @@
+program test1;
+%%errorHERE!
+var a, b, c : int;
+{
+    a = -5;
+    b = 2;
+    if (4 <> 5 )
+    {
+        b = a;
+    }
+    else
+    {
+        c = a + b;
+    };
+
+    print( a, b, c);
+}
