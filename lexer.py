@@ -6,39 +6,51 @@ class MyLexer(object):
     def __init__(self):
         self.keywords = {
             'program': 'PROGRAM',
-            'print': 'PRINT',
             'if': 'IF',
             'else': 'ELSE',
-            'var': 'VAR',
+            'vars': 'VARS',
             'int': 'INT',
-            'float': 'FLOAT'
-
+            'for': 'FOR',
+            'while': 'WHILE',
+            'call': 'CALL',
+            'body': 'BODY',
+            'read': 'READ',
+            'float': 'FLOAT',
+            'char': 'CHAR',
+            'return': 'RETURN',
+            'main': 'MAIN',
+            'void': 'VOID',
+            'func': 'FUNC'
     }
 
     # Tokens based on the parser
 
     tokens = ['SEMICOLON', 'LEFTBRACKET', 'RIGHTBRACKET', 'GREATER', 'LESS', 'NOTEQUAL', 'PLUS', 'MINUS', 'TIMES', 'DIVIDE',
-            'LEFTPAREN', 'RIGHTPAREN', 'ID', 'CTEI', 'CTEF', 'COLON', 'EQUALS', 'CTESTRING', 'COMMA', 'PROGRAM', 'PRINT',
-            'IF', 'ELSE', 'VAR', 'INT', 'FLOAT']
+            'LEFTPAREN', 'RIGHTPAREN', 'ID', 'CTEI', 'CTEF', 'COLON', 'ASSIGNMENT', 'CTE_STRING', 'COMMA', 'PROGRAM', 'PRINT',
+            'IF', 'FOR', 'ELSE', 'VARS', 'INT', 'FLOAT', 'CHAR', 'RIGHTSQBRACKE', 'LEFTSQBRACKE', 'MAIN', 'BODY', 'TYPE_SIMPLE',
+            'VARIABLE', 'BODY_RETURN', 'PARAMS', 'CALL', 'READ', 'EQUAL']
 
     # Regular expressions
 
     t_SEMICOLON = r'\;'
     t_LEFTBRACKET = r'\{'
     t_RIGHTBRACKET = r'\}'
-    t_GREATER = r'>'
-    t_LESS = r'<'
-    t_NOTEQUAL = r'<>'
+    t_GREATER = r'\>'
+    t_LESS = r'\<'
+    t_NOTEQUAL = r'\!='
     t_PLUS = r'\+'
     t_MINUS = r'-'
     t_TIMES = r'\*'
     t_DIVIDE = r'\/'
     t_LEFTPAREN = r'\('
     t_RIGHTPAREN = r'\)'
-    t_COLON = r':'
-    t_EQUALS = r'\='
+    t_COLON = r'\:'
+    t_ASSIGNMENT = r'\='
+    t_EQUAL = r'\=='
     t_CTESTRING = r'\".*\"'
     t_COMMA = r'\,'
+    t_RIGHTSQBRACKET = r'\]'
+    t_LEFTSQBRACKET = r'\['
     # A string containing ignored characters (spaces and tabs)
     t_ignore  = ' \t'
 
@@ -54,18 +66,23 @@ class MyLexer(object):
 
 
     # Define a float number
-    def t_CTEF(self,t):
+    def t_CTE_F(self,t):
         r'[0-9]*\.[0-9]+|[0-9]+'
         t.value = float(t.value)
         return t
 
 
     # Define a variable int
-    def t_CTEI(self,t):
+    def t_CTE_I(self,t):
         r'[1-9][0-9]*'
         t.value = int(t.value)
         return t
 
+    # Define a variable int
+    def t_CTE_I(self,t):
+        r'\".*\"' 
+        t.value = int(t.value)
+        return t
 
     # Define a new line or multiple new lines
     def t_newline(self,t):
@@ -75,7 +92,7 @@ class MyLexer(object):
 
     # Define a comment
     def t_comment(self,t):
-        r'\%%.*'
+        r'\//.*'
         pass
 
 
