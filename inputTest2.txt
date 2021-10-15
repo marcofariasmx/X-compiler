@@ -1,10 +1,17 @@
 program test1;
 //errorHERE!
-var a, b, c : int;
+vars 
+    int a, b, c;
+
+func void funcion1(){
+    float x, y, z;
+}
+
+main()
 {
-    a = -5;
+    a = 5;
     b = 2;
-    if (4 <> 5 )
+    if (4 != 5 )
     {
         b = a;
     }
