@@ -20,15 +20,17 @@ class MyLexer(object):
             'return': 'RETURN',
             'main': 'MAIN',
             'void': 'VOID',
-            'func': 'FUNC'
+            'func': 'FUNC',
+            'to': 'TO',
+            'print': 'PRINT'
     }
 
     # Tokens based on the parser
 
     tokens = ['SEMICOLON', 'LEFTBRACKET', 'RIGHTBRACKET', 'GREATER', 'LESS', 'NOTEQUAL', 'PLUS', 'MINUS', 'TIMES', 'DIVIDE',
-            'LEFTPAREN', 'RIGHTPAREN', 'ID', 'CTEI', 'CTEF', 'COLON', 'ASSIGNMENT', 'CTE_STRING', 'COMMA', 'PROGRAM', 'PRINT',
-            'IF', 'FOR', 'ELSE', 'VARS', 'INT', 'FLOAT', 'CHAR', 'RIGHTSQBRACKE', 'LEFTSQBRACKE', 'MAIN', 'BODY', 'TYPE_SIMPLE',
-            'VARIABLE', 'BODY_RETURN', 'PARAMS', 'CALL', 'READ', 'EQUAL']
+            'LEFTPAREN', 'RIGHTPAREN', 'ID', 'CTE_I', 'CTE_F', 'CTE_CH', 'COLON', 'ASSIGNMENT', 'CTE_STRING', 'COMMA', 'PROGRAM', 'PRINT',
+            'IF', 'FOR', 'ELSE', 'VARS', 'INT', 'FLOAT', 'CHAR', 'RIGHTSQBRACKET', 'LEFTSQBRACKET', 'MAIN', 'BODY', 'TYPE_SIMPLE',
+            'VARIABLE', 'BODY_RETURN', 'PARAMS', 'CALL', 'READ', 'EQUAL', 'FUNC', 'VOID', 'RETURN', 'TO', 'WHILE']
 
     # Regular expressions
 
@@ -47,7 +49,7 @@ class MyLexer(object):
     t_COLON = r'\:'
     t_ASSIGNMENT = r'\='
     t_EQUAL = r'\=='
-    t_CTESTRING = r'\".*\"'
+    t_CTE_STRING = r'\".*\"'
     t_COMMA = r'\,'
     t_RIGHTSQBRACKET = r'\]'
     t_LEFTSQBRACKET = r'\['
@@ -79,7 +81,7 @@ class MyLexer(object):
         return t
 
     # Define a variable int
-    def t_CTE_I(self,t):
+    def t_CTE_CH(self,t):
         r'\".*\"' 
         t.value = int(t.value)
         return t

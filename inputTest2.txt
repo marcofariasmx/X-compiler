@@ -1,10 +1,11 @@
 program test1;
-//errorHERE!
+//error HERE if uncommented !
 vars 
     int a, b, c;
 
-func void funcion1(){
-    float x, y, z;
+func void funcion1 (){
+    vars
+        float x, y, z;
 }
 
 main()
@@ -18,7 +19,8 @@ main()
     else
     {
         c = a + b;
-    };
+    }
 
-    print( a, b, c);
+    print( a, b, c ) ;
+    print(a);
 }

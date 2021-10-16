@@ -28,59 +28,56 @@ def p_vars(p):
 
 def p_functions(p):
     ''' functions    :   FUNC functionType
-        functionType :   type_simple ID RIGHTPAREN params LEFTPAREN body_return
-                     |   VOID ID RIGHTPAREN params LEFTPAREN body
+        functionType :   type_simple ID LEFTPAREN params RIGHTPAREN body_return
+                     |   VOID ID LEFTPAREN RIGHTPAREN body
     '''
 
-def type_simple(p):
+def p_type_simple(p):
     ''' type_simple :   INT
                     |   FLOAT
                     |   CHAR
     '''
     
-def variable(p):
+def p_variable(p):
     ''' variable    :   ID
                     |   ID LEFTSQBRACKET exp RIGHTSQBRACKET
                     |   ID LEFTSQBRACKET exp RIGHTSQBRACKET LEFTSQBRACKET exp RIGHTSQBRACKET
     '''
 
-def params(p):
-    ''' params  :   ID params1
-        params1 :   type_simple ID
-                |   type_simple ID COMMA params1
+def p_params(p):
+    ''' params  :   type_simple ID
+                |   type_simple ID COMMA params
     '''
     
-def body(p):
+def p_body(p):
     ''' body    :   LEFTBRACKET body1 RIGHTBRACKET
         body1   :   statute
                 |   statute body1
                 |   empty
     '''
 
-def body_return(p):
+def p_body_return(p):
     ''' body_return    :   LEFTBRACKET body_return1 RETURN factor RIGHTBRACKET
         body_return1   :   statute
                        |   statute body_return1
                        |   empty
     '''
 
-def call(p):
+def p_call(p):
     ''' call    :   ID LEFTPAREN call1 RIGHTPAREN
         call1   :   exp
                 |   exp COMMA call1
     '''
 
-
-
-
 def p_statute(p):
-    '''statute  :   read
+    '''statute  :   vars
+                |   assignment
+                |   write
+                |   read
+                |   if
                 |   for
                 |   while
                 |   call
-                |   assignment
-                |   if
-                |   write
     '''
 def p_assignment(p):
     '''assignment :     ID ASSIGNMENT expression SEMICOLON
@@ -89,9 +86,8 @@ def p_assignment(p):
 ########## review cte_string
 def p_write(p):
     '''write  :   PRINT LEFTPAREN write1 RIGHTPAREN SEMICOLON
-       write1 :   expression write2
-              |   CTE_STRING
-       write2 :   COMMA write1 
+       write1 :   expression COMMA write1
+              |   expression
     '''
 
 def p_read(p):
@@ -104,7 +100,11 @@ def p_read(p):
 def p_if(p):
     '''if  :   IF LEFTPAREN expression RIGHTPAREN body if1
        if1 :   ELSE body
-                  |   empty
+           |   empty
+    '''
+
+def p_for(p):
+    '''for  :   FOR LEFTPAREN expression TO factor RIGHTPAREN body
     '''
 
 def p_while(p):
@@ -130,7 +130,7 @@ def p_term(p):
              |   factor DIVIDE term   
     '''
 def p_factor(p):
-    '''factor :   LEFTPARAM exp RIGHTPARAM
+    '''factor :   LEFTPAREN exp RIGHTPAREN
               |   CTE_I
               |   CTE_F
               |   CTE_CH
@@ -170,3 +170,9 @@ if __name__ == '__main__':
             print(EOFError)
     else:
         print("No file to compile found")
+
+
+#####DEBUGS:
+
+# 1) Resolver lo de CTE_String y CTE_CH
+# 2) Al haberlo resuelto, cambiar la gramática para que incluya comillas y se de a entender que eso es el string o char
