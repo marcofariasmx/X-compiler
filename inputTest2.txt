@@ -1,5 +1,7 @@
 program test1;
 //error HERE if uncommented !
+//The purpose of this small program is to test addition, subtraction divition and multiplication and some boolean logic
+
 vars 
     int a, b, c;
 
