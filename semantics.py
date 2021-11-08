@@ -2,6 +2,7 @@ class Semantic():
     
     def __init__(self):
 
+        # Dictionary of dictionaries to express the semantic cube
         self.semantic_cube = {
             'int': {
                 '+': {
