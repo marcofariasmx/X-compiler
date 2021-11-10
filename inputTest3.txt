@@ -14,18 +14,18 @@ main()
 {
     vars
         char char1;
-        
-    a = 5;
-    b = 2;
+
+    a1 = 5;
+    b1 = 2;
     if (4 != 5 )
     {
-        b = a;
+        b2 = a2;
     }
     else
     {
-        c = a + b;
+        c1 = a3 + b3;
     }
 
-    print( a, b, c ) ;
-    print(a);
+    print( a4, b4, c2 ) ;
+    print(a5);
 }

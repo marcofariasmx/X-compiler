@@ -105,16 +105,17 @@ class MyLexer(object):
      
      # Test its output
     def test(self,data):
-        self.lexer.input(data)
-        self.lexer.lineno = 1
+        lexer = self.build()
+        lexer.input(data)
+        lexer.lineno = 1
         while True:
-            tok = self.lexer.token()
+            tok = lexer.token()
             if not tok: 
                 break
             print(tok)
 
     # Build the lexer
     def build(self,**kwargs):
-        self.lexer = lex.lex(module=self, **kwargs)
+        lexer = lex.lex(module=self, **kwargs)
         
-        return self.lexer
+        return lexer
