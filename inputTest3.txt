@@ -26,6 +26,9 @@ main()
         c1 = a3 + b3;
     }
 
+    vars
+        char char2;
+
     print( a4, b4, c2 ) ;
     print(a5);
 }

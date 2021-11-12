@@ -1,9 +1,7 @@
 import ply.yacc as yacc
-
+import sys
 from lexer import MyLexer
-
 from FuncsDir_Vars_Table import FuncsDir_Vars_Table
-
 from collections import defaultdict
 
 class MyParser(object):
@@ -27,6 +25,10 @@ class MyParser(object):
         self.declaredVars = defaultdict(list)
         self.currScope = ''
         self.ownerFunc = ''
+        self.operand1 = defaultdict(list)
+        self.operand2 = defaultdict(list)
+        self.operator = ''
+        self.result = []
 
     #Helper functions
     def storeDeclaredVars(self):
@@ -40,8 +42,21 @@ class MyParser(object):
 
     def insertVars(self):
         for var in self.declaredVars['name']:
+
+            #Search for var id-name in current VarTable if found throw Error “multiple declaration”
+            #if not, add var id-name and current-type to current VarTable
+            for idx, varInDir in enumerate(self.dirTable.VarsDirectory['name']):
+                #print(varInDir)
+                #print(self.dirTable.VarsDirectory['ownerFunc'][idx])
+                if varInDir == var and self.dirTable.VarsDirectory['ownerFunc'][idx] == self.ownerFunc:
+                    exitErrorText = " Error: multiple declaration of variable: “" + var + '” ' 'in scope of “' + self.ownerFunc + '”'
+                    sys.exit(exitErrorText)
+
             self.dirTable.insertVariable(var, self.declaredVars['type'][0], self.ownerFunc, self.currScope)
         self.declaredVars.clear()
+
+        #########------BUG-----##########
+        #Need to handle and get rid of the rest of the variables used in scopes from the variables addtions, etc (Everything after the =, ex: c = a + b, in this case is a + b) in order to be able to add vars later on in the function.
 
     # Grammar declaration
 
@@ -102,15 +117,6 @@ class MyParser(object):
         
         self.storeDeclaredVars()
 
-        ########
-
-        #If current Func doesn’t have a VarTable then Create VarTable and link it to current Func
-        #if p[1] == 'vars':
-        #    for var in self.varNames:
-        #        self.dirTable.insertVariable(var, self.varType[0], self.currScope)
-        #    self.varType.clear()
-        #    self.varNames.clear()
-
     def p_singleVar(self, p):
         ''' 
             singleVar  :  variable
@@ -161,8 +167,8 @@ class MyParser(object):
         
     def p_variable(self, p):
         ''' variable    :   ID
-                        |   ID LEFTSQBRACKET exp RIGHTSQBRACKET
-                        |   ID LEFTSQBRACKET exp RIGHTSQBRACKET LEFTSQBRACKET exp RIGHTSQBRACKET
+                        |   ID LEFTSQBRACKET nano_exp RIGHTSQBRACKET
+                        |   ID LEFTSQBRACKET nano_exp RIGHTSQBRACKET LEFTSQBRACKET nano_exp RIGHTSQBRACKET
         '''
 
         print("-----VARIABLE------")
@@ -204,8 +210,8 @@ class MyParser(object):
 
     def p_call(self, p):
         ''' call    :   ID LEFTPAREN call1 RIGHTPAREN
-            call1   :   exp
-                    |   exp COMMA call1
+            call1   :   expression
+                    |   expression COMMA call1
         '''
         print("-----p_call------")
         print(*p)
@@ -242,10 +248,10 @@ class MyParser(object):
         print(*p)
 
     def p_read(self, p):
-        '''read  :   READ LEFTPAREN read1 RIGHTPAREN SEMICOLON
-        read1 :   variable 
-                |   variable read2
-        read2 :   COMMA read1 
+        ''' read    :   READ LEFTPAREN read1 RIGHTPAREN SEMICOLON
+            read1   :   variable 
+                    |   variable read2
+            read2   :   COMMA read1 
         '''
 
         print("-----p_read------")
@@ -275,43 +281,63 @@ class MyParser(object):
         print(*p)
 
     def p_expression(self, p):
-        ''' expression  :   exp
-                        |   exp GREATER exp
-                        |   exp LESS exp
-                        |   exp NOTEQUAL exp
-                        |   exp EQUAL exp
+        ''' expression  :   mili_exp expression2
+            expression2 :   OR expression
+                        |   empty
         '''
-
         print("-----p_expression------")
         print(*p)
 
-
-    def p_exp(self, p):
-        ''' exp :   term
-                |   term PLUS exp
-                |   term MINUS exp
+    def p_mili_exp(self, p):
+        ''' mili_exp    :   micro_exp mili_exp2
+            mili_exp2   :   AND mili_exp
+                        |   empty
         '''
-
-        print("-----p_exp------")
+        print("-----p_mili_exp------")
         print(*p)
 
-    def p_term(self,p):
-        '''term  :   factor
-                |   factor TIMES term
-                |   factor DIVIDE term   
+    def p_micro_exp(self, p):
+        ''' micro_exp   :   nano_exp
+                        |   nano_exp GREATER nano_exp
+                        |   nano_exp LESS nano_exp
+                        |   nano_exp NOTEQUAL nano_exp
+                        |   nano_exp EQUAL nano_exp 
         '''
+        print("-----p_micro_exp------")
+        print(*p)
 
+    
+    def p_nano_exp(self, p):
+        ''' nano_exp    :   term
+                        |   term PLUS term
+                        |   term MINUS term
+        '''
+        print("-----p_nano_exp------")
+        print(*p)
+    
+    def p_term(self,p):
+        '''term :   factor
+                |   factor TIMES factor
+                |   factor DIVIDE factor   
+        '''
         print("-----p_term------")
         print(*p)
 
+
     def p_factor(self,p):
-        '''factor :   LEFTPAREN exp RIGHTPAREN
-                |   CTE_I
-                |   CTE_F
-                |   CTE_CH
-                |   variable
-                |   CALL
+        '''factor   :   LEFTPAREN expression RIGHTPAREN
+                    |   CTE_I
+                    |   CTE_F
+                    |   CTE_CH
+                    |   variable
+                    |   call
         '''
+
+        #if p[1]:
+            #Check first if var is declared under current scope
+            #if p[1] == 
+
+            #elif : #check if it is in global domain.
 
         print("-----p_factor------")
         print(*p)

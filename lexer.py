@@ -30,7 +30,7 @@ class MyLexer(object):
     tokens = ['SEMICOLON', 'LEFTBRACKET', 'RIGHTBRACKET', 'GREATER', 'LESS', 'NOTEQUAL', 'PLUS', 'MINUS', 'TIMES', 'DIVIDE',
             'LEFTPAREN', 'RIGHTPAREN', 'ID', 'CTE_I', 'CTE_F', 'CTE_CH', 'COLON', 'ASSIGNMENT', 'CTE_STRING', 'COMMA', 'PROGRAM', 'PRINT',
             'IF', 'FOR', 'ELSE', 'VARS', 'INT', 'FLOAT', 'CHAR', 'RIGHTSQBRACKET', 'LEFTSQBRACKET', 'MAIN', 'BODY', 'TYPE_SIMPLE',
-            'VARIABLE', 'BODY_RETURN', 'PARAMS', 'CALL', 'READ', 'EQUAL', 'FUNC', 'VOID', 'RETURN', 'TO', 'WHILE']
+            'VARIABLE', 'BODY_RETURN', 'PARAMS', 'CALL', 'READ', 'EQUAL', 'FUNC', 'VOID', 'RETURN', 'TO', 'WHILE', 'OR', 'AND']
 
     # Regular expressions
 
@@ -53,6 +53,9 @@ class MyLexer(object):
     t_COMMA = r'\,'
     t_RIGHTSQBRACKET = r'\]'
     t_LEFTSQBRACKET = r'\['
+    t_OR = r'\|'
+    t_AND = r'\&'
+
     # A string containing ignored characters (spaces and tabs)
     t_ignore  = ' \t'
 
