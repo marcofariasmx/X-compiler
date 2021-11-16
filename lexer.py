@@ -69,18 +69,16 @@ class MyLexer(object):
             t.type = self.keywords.get(t.value, 'ID')
         return t
 
+    # Define a variable int
+    def t_CTE_I(self,t):
+        r'[1-9][0-9]*'
+        t.value = int(t.value)
+        return t
 
     # Define a float number
     def t_CTE_F(self,t):
         r'[0-9]*\.[0-9]+|[0-9]+'
         t.value = float(t.value)
-        return t
-
-
-    # Define a variable int
-    def t_CTE_I(self,t):
-        r'[1-9][0-9]*'
-        t.value = int(t.value)
         return t
 
     # Define a variable int

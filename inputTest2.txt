@@ -14,9 +14,14 @@ main()
 {
     vars
         char char1;
+        int numero1;
         
     a = 5;
     b = 2;
+    c = b;
+    //c = x;
+    //c = noexiste;
+    letra = char1;
     if (4 != 5 )
     {
         b = a;

@@ -25,10 +25,16 @@ class MyParser(object):
         self.declaredVars = defaultdict(list)
         self.currScope = ''
         self.ownerFunc = ''
+
+        #Quadruples
         self.operand1 = defaultdict(list)
         self.operand2 = defaultdict(list)
         self.operator = ''
         self.result = []
+
+        #Temp factors list.
+        self.factors = defaultdict(list)
+
 
     #Helper functions
     def storeDeclaredVars(self):
@@ -41,18 +47,18 @@ class MyParser(object):
         self.varType = ''
 
     def insertVars(self):
-        for var in self.declaredVars['name']:
+        for idx, varName in enumerate(self.declaredVars['name']):
 
-            #Search for var id-name in current VarTable if found throw Error “multiple declaration”
+            #Before insert earch for var id-name in current VarTable if found throw Error “multiple declaration”
             #if not, add var id-name and current-type to current VarTable
-            for idx, varInDir in enumerate(self.dirTable.VarsDirectory['name']):
+            for idx2, varInDir in enumerate(self.dirTable.VarsDirectory['name']):
                 #print(varInDir)
                 #print(self.dirTable.VarsDirectory['ownerFunc'][idx])
-                if varInDir == var and self.dirTable.VarsDirectory['ownerFunc'][idx] == self.ownerFunc:
-                    exitErrorText = " Error: multiple declaration of variable: “" + var + '” ' 'in scope of “' + self.ownerFunc + '”'
+                if varInDir == varName and self.dirTable.VarsDirectory['ownerFunc'][idx2] == self.ownerFunc:
+                    exitErrorText = " Error: multiple declaration of variable: “" + varName + '” ' 'in scope of “' + self.ownerFunc + '”'
                     sys.exit(exitErrorText)
 
-            self.dirTable.insertVariable(var, self.declaredVars['type'][0], self.ownerFunc, self.currScope)
+            self.dirTable.insertVariable(varName, self.declaredVars['type'][idx], self.ownerFunc, self.currScope)
         self.declaredVars.clear()
 
         #########------BUG-----##########
@@ -72,8 +78,11 @@ class MyParser(object):
         self.ownerFunc = 'main'
         self.insertVars()
 
+
+        print("AQUI VARNAMES!")
         print(self.varNames)
         print(self.varType)
+        print('factors: ', self.factors)
 
     def p_expression_program_id(self, p):
         '''
@@ -110,18 +119,18 @@ class MyParser(object):
 
     def p_vars(self, p):
         ''' 
-            vars    :  VARS type_simple multiVar SEMICOLON
+            vars    :   VARS vars_body
         '''
         print("----VARS-----")
         print(*p)
-        
-        self.storeDeclaredVars()
 
-    def p_singleVar(self, p):
+
+    def p_vars_body(self, p):
         ''' 
-            singleVar  :  variable
+            vars_body   :   type_simple multiVar SEMICOLON vars_body
+                        |   empty
         '''
-        print("----p_singleVar-----")
+        print("----p_vars_body-----")
         print(*p)
 
     def p_multiVar(self, p):
@@ -132,9 +141,18 @@ class MyParser(object):
         print("----p_multiVar-----")
         print(*p)
 
+        self.storeDeclaredVars()
+
+    def p_singleVar(self, p):
+        ''' 
+            singleVar  :  variable
+        '''
+        print("----p_singleVar-----")
+        print(*p)
+
     def p_functions(self, p):
         ''' functions    :   FUNC functionType
-            functionType :   type_simple function_id LEFTPAREN params RIGHTPAREN body_return
+            functionType :   type_simple ID LEFTPAREN params RIGHTPAREN body_return
                          |   VOID ID LEFTPAREN RIGHTPAREN body
         '''
         print("-----FUNCTIONS------")
@@ -145,7 +163,7 @@ class MyParser(object):
             self.dirTable.insertFunction(p[2], p[1], 1, None, None)
             self.ownerFunc = p[2]
 
-
+    #MOMENTARILY UNUSED
     def p_expression_function_id(self, p):
         '''
         function_id : ID
@@ -231,7 +249,8 @@ class MyParser(object):
 
 
     def p_assignment(self, p):
-        '''assignment :     ID ASSIGNMENT expression SEMICOLON
+        '''
+            assignment  :   ID ASSIGNMENT expression SEMICOLON
         '''
 
         print("-----p_assignment------")
@@ -239,9 +258,10 @@ class MyParser(object):
 
     ########## review cte_string
     def p_write(self, p):
-        '''write  :   PRINT LEFTPAREN write1 RIGHTPAREN SEMICOLON
-        write1 :   expression COMMA write1
-                |   expression
+        '''
+            write   :   PRINT LEFTPAREN write1 RIGHTPAREN SEMICOLON
+            write1  :   expression COMMA write1
+                    |   expression
         '''
 
         print("-----p_write------")
@@ -326,12 +346,86 @@ class MyParser(object):
 
     def p_factor(self,p):
         '''factor   :   LEFTPAREN expression RIGHTPAREN
-                    |   CTE_I
-                    |   CTE_F
-                    |   CTE_CH
-                    |   variable
-                    |   call
+                    |   factor_int
+                    |   factor_float
+                    |   factor_char
+                    |   factor_variable
+                    |   factor_call
         '''
+        print("-----p_factor------")
+        print(*p)
+
+    def p_factor_int(self,p):
+        '''
+            factor_int   :   CTE_I
+        '''
+        self.factors['name'].append(p[1])
+        self.factors['type'].append('int')
+        print("-----p_factor_int------")
+        print(*p)
+
+    def p_factor_float(self,p):
+        '''
+            factor_float   :   CTE_F
+        '''
+        self.factors['name'].append(p[1])
+        self.factors['type'].append('float')
+        print("-----p_factor_float------")
+        print(*p)
+
+    def p_factor_char(self,p):
+        '''
+            factor_char   :   CTE_CH
+        '''
+        self.factors['name'].append(p[1])
+        self.factors['type'].append('char')
+        print("-----p_factor_char------")
+        print(*p)
+
+    def p_factor_variable(self,p):
+        '''
+            factor_variable   :   variable
+        '''
+        
+        #Check if variable to store exists locally in not yet saved function
+        localVarFound = False
+        for idx, varName in enumerate(self.declaredVars['name']):
+            print("PRUEBAAAAA222222222222222222")
+            print('varName: ', varName)
+            print('self.varNames[0]: ', self.varNames[0])
+            print(self.varNames)
+            if varName == self.varNames[0]:
+                print("ENTRO IFFFFFFFFFFFF")
+                self.factors['name'].append(self.declaredVars['name'][idx])
+                self.factors['type'].append(self.declaredVars['type'][idx])
+                print('factors: ', self.factors)
+                print('declaredVars: ', self.declaredVars)
+                self.varNames.clear()
+                localVarFound = True
+                break
+        #If variable was not found locally, check if variable to store exists in VarsDirectory that belongs to a global var
+        varType = None
+        if not localVarFound:
+            varType = self.dirTable.getVarType_Global(self.varNames[0])
+        if not localVarFound and varType:
+            self.factors['name'].append(self.varNames[0])
+            self.factors['type'].append(varType)
+            print(self.factors)
+            self.varNames.clear()
+        #If variable was not found anywhere, throw an error and exit
+        elif not localVarFound and not varType:
+            noVarNameErrorText = " Error: variable “" + self.varNames[0] + '” does not exist in current scope or globally'
+            sys.exit(noVarNameErrorText)
+
+        print("-----p_factor_variable------")
+        print(*p)
+
+    def p_factor_call(self,p):
+        '''
+            factor_call   :   call
+        '''
+        print("-----p_factor_call------")
+        print(*p)
 
         #if p[1]:
             #Check first if var is declared under current scope
@@ -357,3 +451,4 @@ class MyParser(object):
 
 # 1) Resolver lo de CTE_String y CTE_CH
 # 2) Al haberlo resuelto, cambiar la gramática para que incluya comillas y se de a entender que eso es el string o char
+# 3) Be able to store variables with the same name in global and local scopes
