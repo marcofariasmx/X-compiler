@@ -395,58 +395,6 @@ def main():
             #Trae el valor y lo imprime
             texto = getValor(pilaCorriendo, cuadruplo[1], getTipo(cuadruplo[1]))
             print("<< ",str(texto))
-        #dibuja linea
-        elif cuadruplo[0] == 'linea':
-            numero = getValor(pilaCorriendo,cuadruplo[1], getTipo(cuadruplo[1]))
-            if cuadruplo[3] == 'fd':
-                fd(int(numero))
-            elif cuadruplo[3] == 'bk':
-                bk(int(numero))
-            elif cuadruplo[3] == 'rt':
-                rt(int(numero))
-            elif cuadruplo[3] == 'lt':
-                lt(int(numero))
-        #penup
-        elif cuadruplo[0] == 'penup':
-            pen_up()
-        #pendown
-        elif cuadruplo[0] == 'pendown':
-            pen_down()
-        #limpiar
-        elif cuadruplo[0] == 'limpiar':
-            clear_screen()
-        #punto
-        elif cuadruplo[0] == 'punto':
-            y = getValor(pilaCorriendo,cuadruplo[1],getTipo(cuadruplo[1]))
-            x = getValor(pilaCorriendo, cuadruplo[2],getTipo(cuadruplo[2]))
-            setxy(int(x),int(y))
-        #circulo
-        elif cuadruplo[0] == 'circulo':
-            x = get_x()
-            y = get_y()
-            r = getValor(pilaCorriendo, cuadruplo[1], getTipo(cuadruplo[1]))
-            circle(int(x),int(y),int(r))
-            delay(250)
-        elif cuadruplo[0] == 'color':
-            colornumber = getValor(pilaCorriendo, cuadruplo[1], getTipo(cuadruplo[1]))
-            #print(colornumber)
-            random.seed(int(colornumber))
-            r = random.randrange(0,255)
-            g = random.randrange(0,255)
-            b = random.randrange(0,255)
-            set_color(color_rgb(r,g,b))
-        #grosor
-        elif cuadruplo[0] == 'grosor':
-            grosor = getValor(pilaCorriendo, cuadruplo[1], getTipo(cuadruplo[1]))
-            set_line_width(int(grosor))
-        elif cuadruplo[0] == 'arco':
-            x = get_x()
-            y = get_y()
-            radio_x = getValor(pilaCorriendo, cuadruplo[2],getTipo(cuadruplo[2]))
-            radio_y = getValor(pilaCorriendo,cuadruplo[1],getTipo(cuadruplo[1]))
-            start_angle = 0
-            end_angle = 180
-            draw_arc(x,y,start_angle,end_angle,int(radio_x),int(radio_y))
         #ARREGLO
         elif cuadruplo[0] == 'VER':
             valor = int(getValor(pilaCorriendo, cuadruplo[1], getTipo(cuadruplo[1])))
@@ -523,6 +471,6 @@ for linea in cuadruplos:
     cuaLista.append(cuadruplo)
 print(constLista)
 
-easy_run(main)
+#easy_run(main)
 
 
