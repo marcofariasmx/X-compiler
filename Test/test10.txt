@@ -1,0 +1,41 @@
+programa TheOnlyLonely;
+variables
+entero: i,j,p;
+flotante: valor;
+
+funcion entero factorial(entero n){
+    si (n>1) entonces{
+        regresa (n * factorial(n-1));
+    } sino{
+        regresa(1);
+    }
+}
+
+funcion void pinta(entero y)
+variables
+entero: x;{
+    x = 1;
+    mientras(x < 11) hacer{
+        circulo(y + x*5);
+        color(x+10);
+        grosor(10-x);
+        x=x+1;
+    }
+}
+
+
+principal(){
+    lee(p);
+    j = p*2;
+    punto(50,100);
+    i = factorial(p);
+    escribe(i);
+    desde i = 0 hasta 9 hacer{
+        pinta(i*j);
+    }
+    escribe(i);
+    mientras(i < 10) hacer{
+        escribe("HelloWorld",factorial(i));
+        i = i +1;
+    }
+}
