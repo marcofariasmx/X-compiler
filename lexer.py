@@ -17,12 +17,15 @@ class MyLexer(object):
             'read': 'READ',
             'float': 'FLOAT',
             'char': 'CHAR',
+            'bool': 'BOOL',
             'return': 'RETURN',
             'main': 'MAIN',
             'void': 'VOID',
             'func': 'FUNC',
             'to': 'TO',
-            'print': 'PRINT'
+            'print': 'PRINT',
+            'True' : 'TRUE',
+            'False' : 'FALSE'
     }
 
     # Tokens based on the parser
@@ -30,7 +33,7 @@ class MyLexer(object):
     tokens = ['SEMICOLON', 'LEFTBRACKET', 'RIGHTBRACKET', 'GREATER', 'LESS', 'NOTEQUAL', 'PLUS', 'MINUS', 'TIMES', 'DIVIDE',
             'LEFTPAREN', 'RIGHTPAREN', 'ID', 'CTE_I', 'CTE_F', 'CTE_CH', 'COLON', 'ASSIGNMENT', 'CTE_STRING', 'COMMA', 'PROGRAM', 'PRINT',
             'IF', 'FOR', 'ELSE', 'VARS', 'INT', 'FLOAT', 'CHAR', 'RIGHTSQBRACKET', 'LEFTSQBRACKET', 'MAIN', 'BODY', 'TYPE_SIMPLE',
-            'VARIABLE', 'BODY_RETURN', 'PARAMS', 'CALL', 'READ', 'EQUAL', 'FUNC', 'VOID', 'RETURN', 'TO', 'WHILE', 'OR', 'AND']
+            'VARIABLE', 'BODY_RETURN', 'PARAMS', 'CALL', 'READ', 'EQUAL', 'FUNC', 'VOID', 'RETURN', 'TO', 'WHILE', 'OR', 'AND', 'BOOL', 'TRUE', 'FALSE']
 
     # Regular expressions
 
@@ -69,16 +72,16 @@ class MyLexer(object):
             t.type = self.keywords.get(t.value, 'ID')
         return t
 
+    # Define a float number
+    def t_CTE_F(self,t):
+        r'[0-9]+(\.([0-9]+)?([eE][-+]?[0-9]+)?|[eE][-+]?[0-9]+)'
+        t.value = float(t.value)
+        return t
+    
     # Define a variable int
     def t_CTE_I(self,t):
         r'[1-9][0-9]*'
         t.value = int(t.value)
-        return t
-
-    # Define a float number
-    def t_CTE_F(self,t):
-        r'[0-9]*\.[0-9]+|[0-9]+'
-        t.value = float(t.value)
         return t
 
     # Define a variable int

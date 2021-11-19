@@ -3,6 +3,7 @@ import sys
 from lexer import MyLexer
 from FuncsDir_Vars_Table import FuncsDir_Vars_Table
 from collections import defaultdict
+from quadruples import quadruples
 
 class MyParser(object):
 
@@ -12,6 +13,7 @@ class MyParser(object):
     
         #Create DirFunc
         self.dirTable = FuncsDir_Vars_Table()
+        self.quads = quadruples()
 
         # Build the parser and lexer
         self.lexer = MyLexer()
@@ -52,17 +54,12 @@ class MyParser(object):
             #Before insert earch for var id-name in current VarTable if found throw Error “multiple declaration”
             #if not, add var id-name and current-type to current VarTable
             for idx2, varInDir in enumerate(self.dirTable.VarsDirectory['name']):
-                #print(varInDir)
-                #print(self.dirTable.VarsDirectory['ownerFunc'][idx])
                 if varInDir == varName and self.dirTable.VarsDirectory['ownerFunc'][idx2] == self.ownerFunc:
                     exitErrorText = " Error: multiple declaration of variable: “" + varName + '” ' 'in scope of “' + self.ownerFunc + '”'
                     sys.exit(exitErrorText)
 
             self.dirTable.insertVariable(varName, self.declaredVars['type'][idx], self.ownerFunc, self.currScope)
         self.declaredVars.clear()
-
-        #########------BUG-----##########
-        #Need to handle and get rid of the rest of the variables used in scopes from the variables addtions, etc (Everything after the =, ex: c = a + b, in this case is a + b) in order to be able to add vars later on in the function.
 
     # Grammar declaration
 
@@ -83,6 +80,10 @@ class MyParser(object):
         print(self.varNames)
         print(self.varType)
         print('factors: ', self.factors)
+
+        print("QUADRUPLES: ")
+        for idx, operator in enumerate(self.quads.quadruples['operator']):
+            print(idx+1, ', ', operator, ', ', self.quads.quadruples['operand1'][idx], ', ', self.quads.quadruples['operand2'][idx], ', ', self.quads.quadruples['result'][idx])
 
     def p_expression_program_id(self, p):
         '''
@@ -178,6 +179,7 @@ class MyParser(object):
         ''' type_simple :   INT
                         |   FLOAT
                         |   CHAR
+                        |   BOOL
         '''
         print("-----TYPE SIMPLE------")
         print(*p)
@@ -250,13 +252,17 @@ class MyParser(object):
 
     def p_assignment(self, p):
         '''
-            assignment  :   ID ASSIGNMENT expression SEMICOLON
+            assignment  :   factor_variable ASSIGNMENT expression SEMICOLON
         '''
+        #Consulting ID type and pushing the operand is done through "factor_variable"
 
+        #Push the operator assignment
+        if p[2]:
+            self.quads.operator_push(p[2])
         print("-----p_assignment------")
         print(*p)
 
-    ########## review cte_string
+
     def p_write(self, p):
         '''
             write   :   PRINT LEFTPAREN write1 RIGHTPAREN SEMICOLON
@@ -278,12 +284,54 @@ class MyParser(object):
         print(*p)
 
     def p_if(self, p):
-        '''if  :   IF LEFTPAREN expression RIGHTPAREN body if1
-        if1 :   ELSE body
-            |   empty
+        ''' if          :   IF LEFTPAREN expression_if RIGHTPAREN body_if else_case body_else
+        '''
+        
+        print("-----p_if------")
+        print(*p)
+
+        if p[1]:
+            self.quads.endQuad()
+
+    def p_else_case(self, p):
+        '''
+            else_case   :   ELSE
+                        |   empty
         '''
 
-        print("-----p_if------")
+        if p[1]:
+            self.quads.generateQuad_else()
+            self.quads.endQuad()
+
+        print("-----p_else_case------####")
+        print(*p)
+
+    def p_expression_if(self, p):
+        '''
+            expression_if   :   expression
+        '''
+
+        self.quads.generateQuad_if()
+
+        print("-----p_expression_if------")
+        print(*p)
+
+    def p_body_if(self, p):
+        '''
+            body_if : body
+        '''
+
+        print("-----p_body_if------")
+        print(*p)
+
+    def p_body_else(self, p):
+        '''
+            body_else   :   body
+                        |   empty
+                        
+        '''
+
+        print("-----p_body_else------")
         print(*p)
 
     def p_for(self, p):
@@ -323,6 +371,9 @@ class MyParser(object):
                         |   nano_exp NOTEQUAL nano_exp
                         |   nano_exp EQUAL nano_exp 
         '''
+        if len(p) >= 3:
+            if p[2]:
+                self.quads.operator_push(p[2])
         print("-----p_micro_exp------")
         print(*p)
 
@@ -332,6 +383,9 @@ class MyParser(object):
                         |   term PLUS term
                         |   term MINUS term
         '''
+        if len(p) >= 3:
+            if p[2]:
+                self.quads.operator_push(p[2])
         print("-----p_nano_exp------")
         print(*p)
     
@@ -340,6 +394,9 @@ class MyParser(object):
                 |   factor TIMES factor
                 |   factor DIVIDE factor   
         '''
+        if len(p) >= 3:
+            if p[2]:
+                self.quads.operator_push(p[2])
         print("-----p_term------")
         print(*p)
 
@@ -349,6 +406,7 @@ class MyParser(object):
                     |   factor_int
                     |   factor_float
                     |   factor_char
+                    |   factor_bool
                     |   factor_variable
                     |   factor_call
         '''
@@ -359,8 +417,8 @@ class MyParser(object):
         '''
             factor_int   :   CTE_I
         '''
-        self.factors['name'].append(p[1])
-        self.factors['type'].append('int')
+
+        self.quads.operand_push(p[1], 'int')
         print("-----p_factor_int------")
         print(*p)
 
@@ -368,8 +426,8 @@ class MyParser(object):
         '''
             factor_float   :   CTE_F
         '''
-        self.factors['name'].append(p[1])
-        self.factors['type'].append('float')
+
+        self.quads.operand_push(p[1], 'float')
         print("-----p_factor_float------")
         print(*p)
 
@@ -377,9 +435,19 @@ class MyParser(object):
         '''
             factor_char   :   CTE_CH
         '''
-        self.factors['name'].append(p[1])
-        self.factors['type'].append('char')
+
+        self.quads.operand_push(p[1], 'char')
         print("-----p_factor_char------")
+        print(*p)
+
+    def p_factor_bool(self,p):
+        '''
+            factor_bool     :   TRUE
+                            |   FALSE
+        '''
+
+        self.quads.operand_push(p[1], 'bool')
+        print("-----p_factor_bool------")
         print(*p)
 
     def p_factor_variable(self,p):
@@ -390,28 +458,20 @@ class MyParser(object):
         #Check if variable to store exists locally in not yet saved function
         localVarFound = False
         for idx, varName in enumerate(self.declaredVars['name']):
-            print("PRUEBAAAAA222222222222222222")
-            print('varName: ', varName)
-            print('self.varNames[0]: ', self.varNames[0])
-            print(self.varNames)
             if varName == self.varNames[0]:
-                print("ENTRO IFFFFFFFFFFFF")
-                self.factors['name'].append(self.declaredVars['name'][idx])
-                self.factors['type'].append(self.declaredVars['type'][idx])
-                print('factors: ', self.factors)
-                print('declaredVars: ', self.declaredVars)
+                self.quads.operand_push(self.declaredVars['name'][idx], self.declaredVars['type'][idx])
                 self.varNames.clear()
                 localVarFound = True
                 break
+        
         #If variable was not found locally, check if variable to store exists in VarsDirectory that belongs to a global var
         varType = None
         if not localVarFound:
             varType = self.dirTable.getVarType_Global(self.varNames[0])
         if not localVarFound and varType:
-            self.factors['name'].append(self.varNames[0])
-            self.factors['type'].append(varType)
-            print(self.factors)
+            self.quads.operand_push(self.varNames[0], varType)
             self.varNames.clear()
+        
         #If variable was not found anywhere, throw an error and exit
         elif not localVarFound and not varType:
             noVarNameErrorText = " Error: variable “" + self.varNames[0] + '” does not exist in current scope or globally'
@@ -425,15 +485,6 @@ class MyParser(object):
             factor_call   :   call
         '''
         print("-----p_factor_call------")
-        print(*p)
-
-        #if p[1]:
-            #Check first if var is declared under current scope
-            #if p[1] == 
-
-            #elif : #check if it is in global domain.
-
-        print("-----p_factor------")
         print(*p)
 
     # Error rule for syntax errors
@@ -451,4 +502,3 @@ class MyParser(object):
 
 # 1) Resolver lo de CTE_String y CTE_CH
 # 2) Al haberlo resuelto, cambiar la gramática para que incluya comillas y se de a entender que eso es el string o char
-# 3) Be able to store variables with the same name in global and local scopes

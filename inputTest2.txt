@@ -19,6 +19,8 @@ main()
     a = 5;
     b = 2;
     c = b;
+    d = 10.55;
+    e = a - b;
     //c = x;
     //c = noexiste;
     letra = char1;

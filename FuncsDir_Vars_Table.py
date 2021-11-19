@@ -33,10 +33,10 @@ class FuncsDir_Vars_Table():
         for idx, varInDir in enumerate(self.VarsDirectory['name']):
             if varInDir == varName:
                 if self.VarsDirectory['scope'][idx] == 'global':
-                    print("PRUEBAAAAAAAAAAAAA")
-                    print(self.VarsDirectory['name'][idx])
-                    print(self.VarsDirectory['ownerFunc'][idx])
-                    print(self.VarsDirectory['scope'][idx])
+                    #print("PRUEBAAAAAAAAAAAAA")
+                    #print(self.VarsDirectory['name'][idx])
+                    #print(self.VarsDirectory['ownerFunc'][idx])
+                    #print(self.VarsDirectory['scope'][idx])
                     return self.VarsDirectory['type'][idx]
         
         return None
