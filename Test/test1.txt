@@ -1,0 +1,22 @@
+programa test1;
+variables
+entero: i;
+char: j;
+flotante: k;
+
+funcion void suma(entero n, flotante m){
+    escribe("Suma entero y flotante", n + m);
+    escribe("Suma flotante y entero", m + n);
+    escribe("Operacion compuesta");
+    escribe(n + m * 4 / 2 - 1);
+}
+
+principal(){
+    escribe("Introduce i");
+    lee(i);
+    escribe("Introduce j");
+    lee(j);
+    escribe("introduce k");
+    lee(k);
+    suma(i,k);
+}
